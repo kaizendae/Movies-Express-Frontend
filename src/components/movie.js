@@ -21,24 +21,27 @@ const Movie = props => {
         <div className="container columns-2">
             <img src={movie.poster + "/100px250"} alt={movie.title} className="object-cover h-180 w-full"/>
             <div className="my-8">
-                <h1 className="text-3xl font-bold">{movie.title}</h1>
-                <p className="text-gray-500 my-2">{movie.rated}</p>
-                <p className="text-gray-500 my-2">{movie.plot}</p>
-                {props.user &&
-                    <Link to={"/movies/" + props.match.params.id + "/review"}>
-                        Add Review
-                    </Link>}
+                <div className="card my-8">
+                    <h1 className="text-3xl font-bold ">{movie.title}</h1>
+                    <p className="text-gray-500 my-2">{movie.rated}</p>
+                    <p className="text-gray-500 my-2">{movie.plot}</p>
+                    {props.user &&
+                        <Link to={"/movies/" + props.match.params.id + "/review"}>
+                            Add Review
+                        </Link>}
+                </div>
 
+                <div className="card my-8">
+                    {movie.reviews.map((review) => (
+                        <div key={review._id} className="p-4 card">
+                            <p>{review.review}</p>
+                            <p className="">{review.name}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-                {movie.reviews.map((review) => (
-                    <div key={review.id} className="p-4 card">
-                        <p>{review.text}</p>
-                        <p className="text-gray-500">{review.user}</p>
-                    </div>
-                ))}
-            </div>
+
         </div>
     );
 }
