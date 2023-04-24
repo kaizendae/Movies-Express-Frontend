@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import MovieDataService from "../services/movies";
 import {Link} from "react-router-dom";
+import {Button, Col, Row} from "react-bootstrap";
+import moment from "moment"
 
 const Movie = props => {
     const [movie, setMovie] = useState({id: null, title: "", description: "", genre: "", rating: "", reviews: []});
@@ -13,9 +15,25 @@ const Movie = props => {
         });
     }
 
+
     useEffect(() => {
         getMovie(props.match.params.id);
     }, [props.match.params.id]);
+
+    function deleteReview(_id, index) {
+        MovieDataService.deleteReview(_id, props.user.id)
+            .then(response => {
+                setMovie((prevState) => {
+                    prevState.reviews.splice(index, 1)
+                    return {
+                        ...prevState
+                    }
+                })
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
 
     return (
         <div className="container columns-2">
@@ -34,15 +52,26 @@ const Movie = props => {
                 <div className="card my-8">
                     {movie.reviews.map((review) => (
                         <div key={review._id} className="p-4 card">
+                            <h5 className="">{review.name + " reviewed on "} {moment(review.date).format("Do MMMM YYYY")}</h5>
                             <p>{review.review}</p>
-                            <p className="">{review.name}</p>
+                            {props.user && props.user.id === review.user_id &&
+                                <Row>
+                                    <Col><Link to={{
+                                        pathname: "/movies/" + props.match.params.id + "/review",
+                                        state: {currentReview: review}
+                                    }}>Edit</Link>
+                                    </Col>
+                                    <Col><Button
+                                        onClick={() => deleteReview(review._id, movie.reviews.indexOf(review))}
+                                        variant="link">Delete</Button></Col>
+                                </Row>
+                            }
                         </div>
                     ))}
                 </div>
             </div>
-
-
         </div>
     );
 }
+
 export default Movie;

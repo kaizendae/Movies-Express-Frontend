@@ -8,7 +8,7 @@ import {Link, Route, Switch} from "react-router-dom";
 import {useState} from "react";
 
 function App() {
-    const [user, setUser] = useState("Elasri");
+    const [user, setUser] = useState(null);
 
     async function login(user = null) {
         setUser(user);
@@ -18,7 +18,7 @@ function App() {
         setUser(null);
     }
 
-    return (<div className="App" data-theme="lofi">
+    return (<div className="App" data-theme="cyberpunk">
         <div className="navbar bg-base-100 px-5">
             <div className="flex-1">
                 <p className="text-xl font-bold">Movies-FE</p>

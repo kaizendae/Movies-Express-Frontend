@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import MovieDataService from "../services/movies";
-import {Container, Form} from "react-bootstrap";
+import {Button, Container, Form} from "react-bootstrap";
 import {ChevronDownIcon} from '@heroicons/react/solid';
 import {Link} from "react-router-dom";
 
@@ -9,11 +9,17 @@ const MoviesList = props => {
     const [searchTitle, setSearchTitle] = useState("");
     const [searchRating, setSearchRating] = useState("");
     const [ratings, setRatings] = useState(["All Ratings"]);
+    const [currentPage, setCurrentPage] = useState(0)
+    const [entriesPerPage, setEntriesPerPage] = useState(0)
+    const [currentSearchMode, setCurrentSearchMode] = useState("")
 
     function retrieveMovies() {
-        MovieDataService.getAll()
+        setCurrentSearchMode("")
+        MovieDataService.getAll(currentPage)
             .then(response => {
                 setMovies(response.data.movies);
+                setCurrentPage(response.data.page)
+                setEntriesPerPage(response.data.entries_per_page)
             })
             .catch(e => {
                 console.log(e);
@@ -28,6 +34,14 @@ const MoviesList = props => {
             .catch(e => {
                 console.log(e);
             });
+    }
+    const retrieveNextPage = () => {
+        if(currentSearchMode === "findByTitle")
+            findByTitle()
+        else if(currentSearchMode === "findByRating")
+            findByRating()
+        else
+            retrieveMovies()
     }
 
     const onsetSearchTitle = e => {
@@ -45,12 +59,21 @@ const MoviesList = props => {
         retrieveRatings();
     }, []);
 
+    useEffect(() => {
+        retrieveMovies()
+        retrieveNextPage()
+    }, [currentPage])
+
+    useEffect(() =>{
+        setCurrentPage(0)
+    },[currentSearchMode])
     function findByRating(event) {
         event.preventDefault();
+        setCurrentSearchMode("findByRating")
         if (searchRating === "All Ratings") {
             retrieveMovies()
         } else {
-            MovieDataService.find(searchRating, "genre")
+            MovieDataService.find(searchRating, "genre", currentPage)
                 .then(response => {
                     console.log(response.data);
                     setMovies(response.data.movies);
@@ -63,7 +86,8 @@ const MoviesList = props => {
 
     function findByTitle(event) {
         event.preventDefault();
-        MovieDataService.find(searchTitle, "title")
+        setCurrentSearchMode("findByTitle")
+        MovieDataService.find(searchTitle, "title", currentPage)
             .then(response => {
                 console.log(" found by title");
                 console.table(response.data)
@@ -94,7 +118,7 @@ const MoviesList = props => {
                                     <button
                                         onClick={findByTitle}
                                         type="submit"
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                        className="btn btn-primary"
                                     >
                                         Search
                                     </button>
@@ -123,7 +147,7 @@ const MoviesList = props => {
                                     <button
                                         onClick={findByRating}
                                         type="submit"
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                        className="btn btn-primary"
                                     >
                                         Search
                                     </button>
@@ -136,8 +160,9 @@ const MoviesList = props => {
             <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
                 {movies.map((movie) => (
                     <div key={movie._id} className="card w-100 bg-base-100 bg-white shadow-md">
-                        {!movie.poster ? <img src="https://cdn-01.media-brady.com/store/stuk/media/catalog/product/d/m/dmeu_y2691646_01_std.lang.all.gif"
-                                              alt={movie.title} className="object-cover h-180 w-full"/> :
+                        {!movie.poster ? <img
+                                src="https://cdn-01.media-brady.com/store/stuk/media/catalog/product/d/m/dmeu_y2691646_01_std.lang.all.gif"
+                                alt={movie.title} className="object-cover h-180 w-full"/> :
                             <img src={movie.poster + "/100px180"}
                                  alt={movie.title} className="object-cover h-180 w-full"/>
                         }
@@ -149,6 +174,16 @@ const MoviesList = props => {
                         </div>
                     </div>
                 ))}
+            </div>
+            <br/>
+            Showing page: {currentPage}.
+            <div className="btn-group grid grid-cols-2">
+                <button className="btn btn-link" onClick={() => {
+                    setCurrentPage(currentPage - 1)
+                }}>Previous page</button>
+                <button className="btn btn-link" onClick={() => {
+                    setCurrentPage(currentPage + 1)
+                }}>Next</button>
             </div>
             {/*<pre>{JSON.stringify(movies, null, 2)}</pre>*/}
         </div>
