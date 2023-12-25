@@ -1,4 +1,4 @@
-## 1. Figure it out (it's ain't that hard).
+## 1. Figure it out (it ain't that hard).
 After running the backend from the other repo as a container, figure out how to run the frontend as a container.
 
 Start from package.json to understand how to start the app and build or run test.
