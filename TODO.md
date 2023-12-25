@@ -3,8 +3,6 @@ After running the backend from the other repo as a container, figure out how to 
 
 Start from package.json to understand how to start the app and build or run test.
 
-You can use the same Dockerfile as the backend, but you will need to change the CMD command to start the app.
-
 You can try the following 3 options:
 - Use a node Image and run the app with start command from package.json, this is not for production use. the other 2 options are production grade.
 - Build the project with npm run build and serve the build folder with a container of a static server like nginx or apache.
